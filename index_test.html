@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browser-Based Image Slideshow</title>
+    <style>
+        /* Basic styling to center the slideshow container */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .slideshow-container {
+            position: relative;
+            width: 80%;
+            max-width: 600px;
+            overflow: hidden;
+        }
+        .slideshow-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        /* Add some styles for slide transitions if needed */
+        .fade {
+            animation: fade 3s ease-in-out infinite;
+        }
+        @keyframes fade {
+            0% { opacity: 0; }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="slideshow-container">
+        <img id="slideImage" class="fade" src="" alt="Browser Specific Slide">
+    </div>
+    <script>
+        // JavaScript to detect browser and start the slideshow
+        function setBrowserImage() {
+            var userAgent = navigator.userAgent;
+            var slideImage = document.getElementById('slideImage');
+            var imageSet = [];
+
+            if (userAgent.indexOf('Firefox') > -1) {
+                imageSet = ['art/6elleFallenAngel4.png', 'art/bochixyujii.png', 'art/AveKobeni_5.png'];
+            } else if (userAgent.indexOf('Chrome') > -1) {
+                imageSet = ['art/6elleFallenAngel4.png', 'art/bochixyujii.png', 'art/AveKobeni_5.png'];
+            } else if (userAgent.indexOf('Safari') > -1 && userAgent.indexOf('Chrome') === -1) {
+                imageSet = ['artjxl/6elleFallenAngel4.jxl', 'artjxl/bochixyujii.jxl', 'artjxl/AveKobeni_5.jxl'];
+            } else if (userAgent.indexOf('Edge') > -1) {
+                imageSet = ['art/6elleFallenAngel4.png', 'art/bochixyujii.png', 'art/AveKobeni_5.png'];
+            } else {
+                imageSet = ['art/6elleFallenAngel4.png', 'art/bochixyujii.png', 'art/AveKobeni_5.png'];
+            }
+
+            // Function to cycle through images
+            let currentIndex = 0;
+            function showNextSlide() {
+                slideImage.src = imageSet[currentIndex];
+                currentIndex = (currentIndex + 1) % imageSet.length;
+                setTimeout(showNextSlide, 3000); // Change image every 3 seconds
+            }
+
+            showNextSlide(); // Start slideshow
+        }
+
+        // Run the function when the page loads
+        window.onload = setBrowserImage;
+    </script>
+</body>
+</html>
