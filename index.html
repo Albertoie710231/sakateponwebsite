@@ -163,9 +163,9 @@
     <script>
         var userAgent = navigator.userAgent;
         var slideImage = document.getElementById('slideImage');
-        let dots = document.getElementsByClassName("dot");
+        var dots = document.getElementsByClassName("dot");
         var imageSet = []
-        let currentIndex = 0;
+        var currentIndex = 0;
 
         function setBrowserImage() {
             var imgpng = ['art/6elleFallenAngel4.png', 'art/bochixyujii.png', 'art/AveKobeni_5.png']
@@ -189,22 +189,58 @@
             showNextSlide(); // Start slideshow
         }
 
-        function plusSlides() {
-            showNextSlide()
+        function disableDots(index) {
+            switch (index) {
+                case 0:
+                    dots[1].className = dots[1].className.replace(" active", "");
+                    dots[2].className = dots[2].className.replace(" active", "");
+                    break;
+                case 1:
+                    dots[0].className = dots[0].className.replace(" active", "");
+                    dots[2].className = dots[2].className.replace(" active", "");
+                    break;
+                case 2:
+                    dots[0].className = dots[0].className.replace(" active", "");
+                    dots[1].className = dots[1].className.replace(" active", "");
+                    break;
+            }
+        }
+
+        function currentSlide(n) {
+            currentIndex = n - 1;
+            showNextSlide();
+            disableDots(currentIndex);
+
+            clearInterval(slideInterval);
+            slideInterval = setInterval(() => plusSlides(1), 5000);
+        }
+
+        function plusSlides(n) {
+            currentIndex = currentIndex + n;
+
+            if (currentIndex < 0) {
+                currentIndex = 2;
+            }
+            else if (currentIndex > 2) {
+                currentIndex = 0;
+            }
+
+            showNextSlide();
+            disableDots(currentIndex);
+
+            clearInterval(slideInterval);
+            slideInterval = setInterval(() => plusSlides(1), 5000);
         }
 
 
         function showNextSlide() {
             slideImage.src = imageSet[currentIndex];
             dots[currentIndex].className += " active";
-            currentIndex = (currentIndex + 1) % imageSet.length;
-            //setTimeout(showNextSlide, 3000); // Change image every 3 seconds
-            dots[(currentIndex + 1) % imageSet.length].className = dots[(currentIndex + 1) % imageSet.length].className.replace(" active", "");
         }
 
         // Run the function when the page loads
         window.onload = setBrowserImage;
-        let slideInterval = setInterval(() => showNextSlide(), 5000); // Change slide every 3 seconds
+        var slideInterval = setInterval(() => plusSlides(1), 5000); // Change slide every 3 seconds
     </script>
 
     <section id="contact" class="contact">
