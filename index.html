@@ -69,6 +69,10 @@
             height: 100vh; /* Full viewport height */
         }
 
+        .slideshow-container picture {
+            display: contents; /* keep the img sized by the container */
+        }
+
         .slideshow-container img {
             display: block;
             margin-left: auto;
@@ -148,99 +152,57 @@
     </header>
 
     <div class="slideshow-container">
-        <img id="slideImage" class="fade" src="" alt="Browser Specific Slide">
+        <!-- The browser picks the JXL if it can decode it, otherwise the PNG. -->
+        <picture>
+            <source id="slideSource" type="image/jxl" srcset="artjxl/6elleFallenAngel4.jxl">
+            <img id="slideImage" src="art/6elleFallenAngel4.png" alt="Artwork">
+        </picture>
 
         <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
         <a class="next" onclick="plusSlides(1)">&#10095;</a>
     </div>
 
-    <div class="dots-container">
-        <span class="dot" onclick="currentSlide(1)"></span>
-        <span class="dot" onclick="currentSlide(2)"></span>
-        <span class="dot" onclick="currentSlide(3)"></span>
-    </div>
+    <div class="dots-container" id="dots"></div>
 
     <script>
-        var userAgent = navigator.userAgent;
+        // Add a slide by adding its file name (without extension).
+        // Each needs art/<name>.png and artjxl/<name>.jxl.
+        var slides = ['6elleFallenAngel4', 'bochixyujii', 'AveKobeni_5'];
+
+        var slideSource = document.getElementById('slideSource');
         var slideImage = document.getElementById('slideImage');
-        var dots = document.getElementsByClassName("dot");
-        var imageSet = []
+        var dotsContainer = document.getElementById('dots');
         var currentIndex = 0;
+        var slideInterval;
 
-        function setBrowserImage() {
-            var imgpng = ['art/6elleFallenAngel4.png', 'art/bochixyujii.png', 'art/AveKobeni_5.png']
-            var imgjxl = ['artjxl/6elleFallenAngel4.jxl', 'artjxl/bochixyujii.jxl', 'artjxl/AveKobeni_5.jxl']
+        slides.forEach(function (name, i) {
+            var dot = document.createElement('span');
+            dot.className = 'dot';
+            dot.onclick = function () { showSlide(i); };
+            dotsContainer.appendChild(dot);
+        });
+        var dots = dotsContainer.children;
 
-            if (userAgent.indexOf('Firefox') > -1) {
-                imageSet = imgpng
-            } else if (userAgent.indexOf('Chrome') > -1) {
-                imageSet = imgpng
-            } else if (userAgent.indexOf('Safari') > -1 && userAgent.indexOf('Chrome') === -1) {
-                imageSet = imgjxl
-            } else if (userAgent.indexOf('Edge') > -1) {
-                imageSet = imgpng
-            } else {
-                imageSet = imgjxl
+        function showSlide(index) {
+            currentIndex = (index + slides.length) % slides.length;
+            var name = slides[currentIndex];
+            slideSource.srcset = 'artjxl/' + name + '.jxl';
+            slideImage.src = 'art/' + name + '.png';
+
+            for (var i = 0; i < dots.length; i++) {
+                dots[i].classList.toggle('active', i === currentIndex);
             }
 
-            // Function to cycle through images
-
-
-            showNextSlide(); // Start slideshow
-        }
-
-        function disableDots(index) {
-            switch (index) {
-                case 0:
-                    dots[1].className = dots[1].className.replace(" active", "");
-                    dots[2].className = dots[2].className.replace(" active", "");
-                    break;
-                case 1:
-                    dots[0].className = dots[0].className.replace(" active", "");
-                    dots[2].className = dots[2].className.replace(" active", "");
-                    break;
-                case 2:
-                    dots[0].className = dots[0].className.replace(" active", "");
-                    dots[1].className = dots[1].className.replace(" active", "");
-                    break;
-            }
-        }
-
-        function currentSlide(n) {
-            currentIndex = n - 1;
-            showNextSlide();
-            disableDots(currentIndex);
-
+            // Restart the timer so a manual click gets a full 5 seconds.
             clearInterval(slideInterval);
-            slideInterval = setInterval(() => plusSlides(1), 5000);
+            slideInterval = setInterval(function () { plusSlides(1); }, 5000);
         }
 
         function plusSlides(n) {
-            currentIndex = currentIndex + n;
-
-            if (currentIndex < 0) {
-                currentIndex = 2;
-            }
-            else if (currentIndex > 2) {
-                currentIndex = 0;
-            }
-
-            showNextSlide();
-            disableDots(currentIndex);
-
-            clearInterval(slideInterval);
-            slideInterval = setInterval(() => plusSlides(1), 5000);
+            showSlide(currentIndex + n);
         }
 
-
-        function showNextSlide() {
-            slideImage.src = imageSet[currentIndex];
-            dots[currentIndex].className += " active";
-        }
-
-        // Run the function when the page loads
-        window.onload = setBrowserImage;
-        var slideInterval = setInterval(() => plusSlides(1), 5000); // Change slide every 3 seconds
+        showSlide(0);
     </script>
 
     <section id="contact" class="contact">
