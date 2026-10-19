@@ -173,7 +173,7 @@
         var slideImage = document.getElementById('slideImage');
         var dotsContainer = document.getElementById('dots');
         var currentIndex = 0;
-        var slideInterval;
+        var slideTimer;
 
         slides.forEach(function (name, i) {
             var dot = document.createElement('span');
@@ -183,7 +183,18 @@
         });
         var dots = dotsContainer.children;
 
+        // Start the 5 seconds only once the image is on screen, so a slow
+        // download doesn't eat into the time the slide is visible.
+        function startTimer() {
+            clearTimeout(slideTimer);
+            slideTimer = setTimeout(function () { plusSlides(1); }, 5000);
+        }
+        slideImage.addEventListener('load', startTimer);
+        slideImage.addEventListener('error', startTimer);
+
         function showSlide(index) {
+            // Stop the old countdown right away; the next one starts on load.
+            clearTimeout(slideTimer);
             currentIndex = (index + slides.length) % slides.length;
             var name = slides[currentIndex];
             slideSource.srcset = 'artjxl/' + name + '.jxl';
@@ -192,10 +203,6 @@
             for (var i = 0; i < dots.length; i++) {
                 dots[i].classList.toggle('active', i === currentIndex);
             }
-
-            // Restart the timer so a manual click gets a full 5 seconds.
-            clearInterval(slideInterval);
-            slideInterval = setInterval(function () { plusSlides(1); }, 5000);
         }
 
         function plusSlides(n) {
@@ -203,6 +210,7 @@
         }
 
         showSlide(0);
+        if (slideImage.complete) startTimer(); // first image may already be loaded
     </script>
 
     <section id="contact" class="contact">
